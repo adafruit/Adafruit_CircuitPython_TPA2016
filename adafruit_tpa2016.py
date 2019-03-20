@@ -107,7 +107,7 @@ class TPA2016:
     compression ratio is NOT 1:1. Defaults to 4mV."""
 
     compression_ratio = RWBits(2, 0x07, 0)
-    """The compression ratio. Ratio settings are: 1:1. 2:1, 4:1, 8:1. Settings options are: 
+    """The compression ratio. Ratio settings are: 1:1. 2:1, 4:1, 8:1. Settings options are:
     COMPRESSION_1_1, COMPRESSION_2_1, COMPRESSION_4_1, COMPRESSION_8_1. Defaults to 4:1."""
 
     def __init__(self, i2c_bus):
@@ -159,7 +159,22 @@ class TPA2016:
     def fixed_gain(self):
         """The fixed gain of the amplifier in dB. If compression is enabled, fixed gain is
         adjustable from ``–28`` to ``30``. If compression is disabled, fixed gain is adjustable
-        from ``0`` to ``30``."""
+        from ``0`` to ``30``.
+
+        The following example sets the fixed gain to -16dB.
+
+        ..code-block:: python
+
+            import adafruit_tpa2016
+            import busio
+            import board
+
+            i2c = busio.I2C(board.SCL, board.SDA)
+            tpa = adafruit_tpa2016.TPA2016(i2c)
+
+            tpa.fixed_gain = -16
+
+        """
         return self._fixed_gain_control
 
     @fixed_gain.setter

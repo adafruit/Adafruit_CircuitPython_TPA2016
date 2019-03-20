@@ -54,6 +54,11 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_TPA2016.git"
 
 
 class TPA2016:
+    """Driver for the TPA2016 class D amplifier.
+
+    :param busio.I2C i2c_bus: The I2C bus the TPA2016 is connected to.
+
+    """
     # Compression ratio settings
     COMPRESSION_1_1 = const(0x0)  # Ratio 1:1
     COMPRESSION_2_1 = const(0x1)  # Ratio 2:1
@@ -61,10 +66,10 @@ class TPA2016:
     COMPRESSION_8_1 = const(0x3)  # Ratio 8:1
 
     # NoiseGate threshold settings
-    NOISEGATE_1 = const(0x0)  # 1mV
-    NOISEGATE_4 = const(0x1)  # 4mV
-    NOISEGATE_10 = const(0x2)  # 10mV
-    NOISEGATE_20 = const(0x3)  # 20mV
+    NOISE_GATE_1 = const(0x0)  # 1mV
+    NOISE_GATE_4 = const(0x1)  # 4mV
+    NOISE_GATE_10 = const(0x2)  # 10mV
+    NOISE_GATE_20 = const(0x3)  # 20mV
 
     _attack_control = RWBits(6, 0x02, 0)
     _release_control = RWBits(6, 0x03, 0)
@@ -74,67 +79,107 @@ class TPA2016:
     _max_gain = RWBits(4, 0x07, 4)
 
     speaker_enable_r = RWBit(0x01, 7)
+    """Enables right speaker. Defaults to enabled. Set to ``False`` to disable."""
     speaker_enable_l = RWBit(0x01, 6)
+    """Enables left speaker. Defaults to enabled. Set to ``False`` to disable."""
     amplifier_shutdown = RWBit(0x01, 5)
+    """Amplifier shutdown. Amplifier is disabled if ``True``. Defaults to ``False``. If ``True``,
+    device is in software shutdown, e.g. control, bias and oscillator are inactive."""
     reset_fault_r = RWBit(0x01, 4)
+    """Over-current event on right channel indicated by returning ``True``. Reset by setting to
+    ``False``."""
     reset_Fault_l = RWBit(0x01, 3)
+    """Over-current event on left channel indicated by returning ``True``. Reset by setting to
+    ``False``."""
     reset_thermal = RWBit(0x01, 2)
+    """Thermal software shutdown indicated by returning ``True``. Reset by setting to ``False``."""
 
-    noisegate_enable = RWBit(0x01, 0)
-    """Enabled by default. Can only be enabled when compression ratio is NOT 1:1."""
+    noise_gate_enable = RWBit(0x01, 0)
+    """NoiseGate function enable. Enabled by default. Can only be enabled when compression ratio
+    is NOT 1:1. To disable, set to ``False``."""
     output_limiter_disable = RWBit(0x06, 7)
-    """Enabled by default when compression ratio is NOT 1:1. Can only be disabled if compression ratio is 1:1."""
+    """Output limiter disable. Enabled by default when compression ratio is NOT 1:1. Can only be
+    disabled if compression ratio is 1:1. To disable, set to ``True``."""
 
-    noisegate_threshold = RWBits(2, 0x06, 5)
-    """Only functional when compression ratio is NOT 1:1."""
+    noise_gate_threshold = RWBits(2, 0x06, 5)
+    """Noise Gate threshold in mV. Noise gate settings are 1mV, 4mV, 10mV, and 20mV. Settings
+    options are NOISE_GATE_1, NOISE_GATE_4, NOISE_GATE_10, NOISE_GATE_20. Only functional when
+    compression ratio is NOT 1:1. Defaults to 4mV."""
 
     compression_ratio = RWBits(2, 0x07, 0)
     """The compression ratio. Ratio settings are: 1:1. 2:1, 4:1, 8:1. Settings options are: 
     COMPRESSION_1_1, COMPRESSION_2_1, COMPRESSION_4_1, COMPRESSION_8_1. Defaults to 4:1."""
 
-    def __init__(self, i2c_bus, address=0x58):
-        self.i2c_device = i2cdevice.I2CDevice(i2c_bus, address)
+    def __init__(self, i2c_bus):
+        self.i2c_device = i2cdevice.I2CDevice(i2c_bus, 0x58)
 
     @property
     def attack_time(self):
-        return 0.1067 * self._attack_control
+        """The attack time. This is the minimum time between gain decreases. Set to ``1`` - ``63``
+        where 1 = 0.1067ms and the time increases 0.1067ms with each step, for a maximum of 6.722ms.
+        Defaults to 5, or 0.5335ms."""
+        return self._attack_control
 
     @attack_time.setter
     def attack_time(self, value):
-        self._attack_control = value
+        if 1 <= value <= 63:
+            self._attack_control = value
+        else:
+            raise ValueError("Attack time must be 1 to 63!")
 
     @property
     def release_time(self):
-        return 0.0137 * self._release_control
+        """The release time. This is the minimum time between gain increases. Set to ``1`` - ``63``
+        where 1 = 0.0137ms, and the time increases 0.0137ms with each step, for a maximum of
+        0.8631ms. Defaults to 11, or 0.1507ms."""
+        return self._release_control
 
     @release_time.setter
     def release_time(self, value):
-        self._release_control = value
+        if 1 <= value <= 63:
+            self._release_control = value
+        else:
+            raise ValueError("Release time must be 1 to 63!")
 
     @property
     def hold_time(self):
-        return 0.0137 * self._hold_time_control
+        """The hold time. This is the minimum time between attack and release. Set to ``0`` -
+        ``63`` where 0 = disabled, and the time increases 0.0137ms with each step, for a maximum of
+        0.8631ms. Defaults to 0, or disabled."""
+        return self._hold_time_control
 
     @hold_time.setter
     def hold_time(self, value):
-        self._hold_time_control = value
+        if 0 <= value <= 63:
+            self._hold_time_control = value
+        else:
+            raise ValueError("Hold time must be 0 to 63!")
 
     @property
     def fixed_gain(self):
+        """The fixed gain of the amplifier in dB. If compression is enabled, fixed gain is
+        adjustable from ``–28`` to ``30``. If compression is disabled, fixed gain is adjustable
+        from ``0`` to ``30``."""
         return self._fixed_gain_control
 
     @fixed_gain.setter
     def fixed_gain(self, value):
-        if -28 <= value <= 30:
-            if self.compression_ratio is not 0:
+        if self.compression_ratio is not 0:
+            if -28 <= value <= 30:
                 ratio = (value & 0x3f)
                 self._fixed_gain_control = ratio
-            self._fixed_gain_control = value
+            else:
+                raise ValueError("Gain must be -28 to 30!")
         else:
-            raise ValueError("Gain must be -28 to 30!")
+            if 0 <= value <= 30:
+                self._fixed_gain_control = value
+            else:
+                raise ValueError("Compression is disabled, gain must be 0 to 30!")
 
     @property
     def output_limiter_level(self):
+        """The output limiter level in dBV. Must be between ``-6.5`` and ``9``, set in increments
+        of 0.5."""
         return -6.5 + 0.5 * self._output_limiter_level
 
     @output_limiter_level.setter
@@ -147,12 +192,13 @@ class TPA2016:
 
     @property
     def max_gain(self):
+        """The max gain in dB. Must be between ``18`` and ``30``."""
         return self._max_gain + 18
 
     @max_gain.setter
     def max_gain(self, value):
         if 18 <= value <= 30:
-            max = value - 18
-            self._max_gain = max
+            max_value = value - 18
+            self._max_gain = max_value
         else:
             raise ValueError("Max gain must be 18 to 30!")

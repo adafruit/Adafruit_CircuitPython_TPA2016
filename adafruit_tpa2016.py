@@ -104,11 +104,41 @@ class TPA2016:
     noise_gate_threshold = RWBits(2, 0x06, 5)
     """Noise Gate threshold in mV. Noise gate settings are 1mV, 4mV, 10mV, and 20mV. Settings
     options are NOISE_GATE_1, NOISE_GATE_4, NOISE_GATE_10, NOISE_GATE_20. Only functional when
-    compression ratio is NOT 1:1. Defaults to 4mV."""
+    compression ratio is NOT 1:1. Defaults to 4mV.
+
+    This example sets the noise gate threshold to 10mV.
+
+    ..code-block:: python
+
+        import adafruit_tpa2016
+        import busio
+        import board
+
+        i2c = busio.I2C(board.SCL, board.SDA)
+        tpa = adafruit_tpa2016.TPA2016(i2c)
+
+        tpa.noise_gate_threshold = tpa.NOISE_GATE_10
+
+    """
 
     compression_ratio = RWBits(2, 0x07, 0)
     """The compression ratio. Ratio settings are: 1:1. 2:1, 4:1, 8:1. Settings options are:
-    COMPRESSION_1_1, COMPRESSION_2_1, COMPRESSION_4_1, COMPRESSION_8_1. Defaults to 4:1."""
+    COMPRESSION_1_1, COMPRESSION_2_1, COMPRESSION_4_1, COMPRESSION_8_1. Defaults to 4:1.
+
+    This example sets the compression ratio to 2:1.
+
+    ..code-block:: python
+
+        import adafruit_tpa2016
+        import busio
+        import board
+
+        i2c = busio.I2C(board.SCL, board.SDA)
+        tpa = adafruit_tpa2016.TPA2016(i2c)
+
+        tpa.compression_ratio = tpa.COMPRESSION_2_1
+
+    """
 
     def __init__(self, i2c_bus):
         self.i2c_device = i2cdevice.I2CDevice(i2c_bus, 0x58)
@@ -117,7 +147,22 @@ class TPA2016:
     def attack_time(self):
         """The attack time. This is the minimum time between gain decreases. Set to ``1`` - ``63``
         where 1 = 0.1067ms and the time increases 0.1067ms with each step, for a maximum of 6.722ms.
-        Defaults to 5, or 0.5335ms."""
+        Defaults to 5, or 0.5335ms.
+
+        This example sets the attack time to 1, or 0.1067ms.
+
+        ..code-block:: python
+
+            import adafruit_tpa2016
+            import busio
+            import board
+
+            i2c = busio.I2C(board.SCL, board.SDA)
+            tpa = adafruit_tpa2016.TPA2016(i2c)
+
+            tpa.attack_time = 1
+
+        """
         return self._attack_control
 
     @attack_time.setter
@@ -131,7 +176,22 @@ class TPA2016:
     def release_time(self):
         """The release time. This is the minimum time between gain increases. Set to ``1`` - ``63``
         where 1 = 0.0137ms, and the time increases 0.0137ms with each step, for a maximum of
-        0.8631ms. Defaults to 11, or 0.1507ms."""
+        0.8631ms. Defaults to 11, or 0.1507ms.
+
+        This example sets release time to 1, or 0.0137ms.
+
+        ..code-block:: python
+
+            import adafruit_tpa2016
+            import busio
+            import board
+
+            i2c = busio.I2C(board.SCL, board.SDA)
+            tpa = adafruit_tpa2016.TPA2016(i2c)
+
+            tpa.release_time = 1
+
+        """
         return self._release_control
 
     @release_time.setter
@@ -145,7 +205,22 @@ class TPA2016:
     def hold_time(self):
         """The hold time. This is the minimum time between attack and release. Set to ``0`` -
         ``63`` where 0 = disabled, and the time increases 0.0137ms with each step, for a maximum of
-        0.8631ms. Defaults to 0, or disabled."""
+        0.8631ms. Defaults to 0, or disabled.
+
+        This example sets hold time to 1, or 0.0137ms.
+
+        ..code-block:: python
+
+            import adafruit_tpa2016
+            import busio
+            import board
+
+            i2c = busio.I2C(board.SCL, board.SDA)
+            tpa = adafruit_tpa2016.TPA2016(i2c)
+
+            tpa.hold_time = 1
+
+        """
         return self._hold_time_control
 
     @hold_time.setter

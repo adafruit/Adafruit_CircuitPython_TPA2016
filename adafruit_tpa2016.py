@@ -98,17 +98,25 @@ class TPA2016:
     """NoiseGate function enable. Enabled by default. Can only be enabled when compression ratio
     is NOT 1:1. To disable, set to ``False``."""
     output_limiter_disable = RWBit(0x06, 7)
-    """Output limiter disable. Enabled by default when compression ratio is NOT 1:1. Can only be
-    disabled if compression ratio is 1:1. To disable, set to ``True``."""
+    """
+
+    Output limiter disable.
+
+    Enabled by default when compression ratio is NOT 1:1. Can only be
+    disabled if compression ratio is 1:1. To disable, set to ``True``.
+    """
 
     noise_gate_threshold = RWBits(2, 0x06, 5)
-    """Noise Gate threshold in mV. Noise gate settings are 1mV, 4mV, 10mV, and 20mV. Settings
+    """
+    Noise Gate threshold in mV.
+
+    Noise gate settings are 1mV, 4mV, 10mV, and 20mV. Settings
     options are NOISE_GATE_1, NOISE_GATE_4, NOISE_GATE_10, NOISE_GATE_20. Only functional when
     compression ratio is NOT 1:1. Defaults to 4mV.
 
     This example sets the noise gate threshold to 10mV.
 
-    ..code-block:: python
+    .. code-block:: python
 
         import adafruit_tpa2016
         import busio
@@ -122,12 +130,15 @@ class TPA2016:
     """
 
     compression_ratio = RWBits(2, 0x07, 0)
-    """The compression ratio. Ratio settings are: 1:1. 2:1, 4:1, 8:1. Settings options are:
+    """
+    The compression ratio.
+
+    Ratio settings are: 1:1. 2:1, 4:1, 8:1. Settings options are:
     COMPRESSION_1_1, COMPRESSION_2_1, COMPRESSION_4_1, COMPRESSION_8_1. Defaults to 4:1.
 
     This example sets the compression ratio to 2:1.
 
-    ..code-block:: python
+    .. code-block:: python
 
         import adafruit_tpa2016
         import busio
@@ -151,7 +162,7 @@ class TPA2016:
 
         This example sets the attack time to 1, or 0.1067ms.
 
-        ..code-block:: python
+        .. code-block:: python
 
             import adafruit_tpa2016
             import busio
@@ -180,7 +191,7 @@ class TPA2016:
 
         This example sets release time to 1, or 0.0137ms.
 
-        ..code-block:: python
+        .. code-block:: python
 
             import adafruit_tpa2016
             import busio
@@ -209,7 +220,7 @@ class TPA2016:
 
         This example sets hold time to 1, or 0.0137ms.
 
-        ..code-block:: python
+        .. code-block:: python
 
             import adafruit_tpa2016
             import busio
@@ -238,7 +249,7 @@ class TPA2016:
 
         The following example sets the fixed gain to -16dB.
 
-        ..code-block:: python
+        .. code-block:: python
 
             import adafruit_tpa2016
             import busio

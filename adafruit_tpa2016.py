@@ -59,6 +59,7 @@ class TPA2016:
     :param busio.I2C i2c_bus: The I2C bus the TPA2016 is connected to.
 
     """
+
     # Compression ratio settings
     COMPRESSION_1_1 = const(0x0)  # Ratio 1:1
     COMPRESSION_2_1 = const(0x1)  # Ratio 2:1
@@ -265,9 +266,9 @@ class TPA2016:
 
     @fixed_gain.setter
     def fixed_gain(self, value):
-        if self.compression_ratio is not 0:
+        if self.compression_ratio:
             if -28 <= value <= 30:
-                ratio = (value & 0x3f)
+                ratio = value & 0x3F
                 self._fixed_gain_control = ratio
             else:
                 raise ValueError("Gain must be -28 to 30!")

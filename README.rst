@@ -66,6 +66,11 @@ Usage Example
 
     tpa.fixed_gain = -16
 
+Documentation
+=============
+
+API documentation for this library can be found on `Read the Docs <https://circuitpython.readthedocs.io/projects/tpa2016/en/latest/>`_.
+
 Contributing
 ============
 

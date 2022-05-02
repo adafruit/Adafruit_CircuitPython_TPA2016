@@ -32,6 +32,12 @@ import adafruit_bus_device.i2c_device as i2cdevice
 from adafruit_register.i2c_bits import RWBits
 from adafruit_register.i2c_bit import RWBit
 
+try:
+    import typing  # pylint: disable=unused-import
+    from busio import I2C
+except ImportError:
+    pass
+
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_TPA2016.git"
 
@@ -135,11 +141,11 @@ class TPA2016:
 
     """
 
-    def __init__(self, i2c_bus):
+    def __init__(self, i2c_bus: I2C) -> None:
         self.i2c_device = i2cdevice.I2CDevice(i2c_bus, 0x58)
 
     @property
-    def attack_time(self):
+    def attack_time(self) -> int:
         """The attack time. This is the minimum time between gain decreases. Set to ``1`` - ``63``
         where 1 = 0.1067ms and the time increases 0.1067ms with each step, for a maximum of 6.722ms.
         Defaults to 5, or 0.5335ms.
@@ -161,14 +167,14 @@ class TPA2016:
         return self._attack_control
 
     @attack_time.setter
-    def attack_time(self, value):
+    def attack_time(self, value: int) -> None:
         if 1 <= value <= 63:
             self._attack_control = value
         else:
             raise ValueError("Attack time must be 1 to 63!")
 
     @property
-    def release_time(self):
+    def release_time(self) -> int:
         """The release time. This is the minimum time between gain increases. Set to ``1`` - ``63``
         where 1 = 0.0137ms, and the time increases 0.0137ms with each step, for a maximum of
         0.8631ms. Defaults to 11, or 0.1507ms.
@@ -190,14 +196,14 @@ class TPA2016:
         return self._release_control
 
     @release_time.setter
-    def release_time(self, value):
+    def release_time(self, value: int) -> None:
         if 1 <= value <= 63:
             self._release_control = value
         else:
             raise ValueError("Release time must be 1 to 63!")
 
     @property
-    def hold_time(self):
+    def hold_time(self) -> int:
         """The hold time. This is the minimum time between attack and release. Set to ``0`` -
         ``63`` where 0 = disabled, and the time increases 0.0137ms with each step, for a maximum of
         0.8631ms. Defaults to 0, or disabled.
@@ -219,14 +225,14 @@ class TPA2016:
         return self._hold_time_control
 
     @hold_time.setter
-    def hold_time(self, value):
+    def hold_time(self, value: int) -> None:
         if 0 <= value <= 63:
             self._hold_time_control = value
         else:
             raise ValueError("Hold time must be 0 to 63!")
 
     @property
-    def fixed_gain(self):
+    def fixed_gain(self) -> int:
         """The fixed gain of the amplifier in dB. If compression is enabled, fixed gain is
         adjustable from ``–28`` to ``30``. If compression is disabled, fixed gain is adjustable
         from ``0`` to ``30``.
@@ -248,7 +254,7 @@ class TPA2016:
         return self._fixed_gain_control
 
     @fixed_gain.setter
-    def fixed_gain(self, value):
+    def fixed_gain(self, value: int) -> None:
         if self.compression_ratio:
             if -28 <= value <= 30:
                 ratio = value & 0x3F
@@ -262,13 +268,13 @@ class TPA2016:
                 raise ValueError("Compression is disabled, gain must be 0 to 30!")
 
     @property
-    def output_limiter_level(self):
+    def output_limiter_level(self) -> float:
         """The output limiter level in dBV. Must be between ``-6.5`` and ``9``, set in increments
         of 0.5."""
         return -6.5 + 0.5 * self._output_limiter_level
 
     @output_limiter_level.setter
-    def output_limiter_level(self, value):
+    def output_limiter_level(self, value: float) -> None:
         if -6.5 <= value <= 9:
             output = int((value + 6.5) / 0.5)
             self._output_limiter_level = output
@@ -276,12 +282,12 @@ class TPA2016:
             raise ValueError("Output limiter level must be -6.5 to 9!")
 
     @property
-    def max_gain(self):
+    def max_gain(self) -> int:
         """The max gain in dB. Must be between ``18`` and ``30``."""
         return self._max_gain + 18
 
     @max_gain.setter
-    def max_gain(self, value):
+    def max_gain(self, value: int) -> None:
         if 18 <= value <= 30:
             max_value = value - 18
             self._max_gain = max_value

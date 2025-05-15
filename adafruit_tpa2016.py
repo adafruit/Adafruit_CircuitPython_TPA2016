@@ -27,13 +27,14 @@ Implementation Notes
 * Adafruit's Register library: https://github.com/adafruit/Adafruit_CircuitPython_Register
 """
 
-from micropython import const
 import adafruit_bus_device.i2c_device as i2cdevice
-from adafruit_register.i2c_bits import RWBits
 from adafruit_register.i2c_bit import RWBit
+from adafruit_register.i2c_bits import RWBits
+from micropython import const
 
 try:
-    import typing  # pylint: disable=unused-import
+    import typing
+
     from busio import I2C
 except ImportError:
     pass
@@ -261,11 +262,10 @@ class TPA2016:
                 self._fixed_gain_control = ratio
             else:
                 raise ValueError("Gain must be -28 to 30!")
+        elif 0 <= value <= 30:
+            self._fixed_gain_control = value
         else:
-            if 0 <= value <= 30:
-                self._fixed_gain_control = value
-            else:
-                raise ValueError("Compression is disabled, gain must be 0 to 30!")
+            raise ValueError("Compression is disabled, gain must be 0 to 30!")
 
     @property
     def output_limiter_level(self) -> float:
